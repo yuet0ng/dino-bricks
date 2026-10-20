@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dino Bricks 网络测试</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --mat:#BCE2CC; --ink:#1F2A4D; --ink-soft:#56627F; --paper:#FFFFFF; --paper-2:#F1F7F3;
+  --good:#2FA866; --good-soft:#DCF3E6; --warn:#C77700; --warn-soft:#FFF1D6; --oops:#E5483F; --oops-soft:#FCE3E1;
+  --blue:#2F74D9;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--mat); color:var(--ink); font:17px/1.5 "PingFang SC","Hiragino Sans GB",system-ui,sans-serif;
+  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:640px; margin:0 auto; padding:20px 16px 48px}
+h1{font-size:26px; margin:8px 0 4px}
+h2{font-size:20px; margin:0 0 8px}
+p{margin:6px 0}
+.card{background:var(--paper); border:3px solid var(--ink); border-radius:18px; padding:16px; margin-top:16px; box-shadow:0 5px 0 var(--ink)}
+.lead{color:var(--ink-soft)}
+button{font:inherit; color:inherit; cursor:pointer}
+.big{display:block; width:100%; margin-top:16px; padding:16px; font-size:22px; font-weight:800; color:#fff; background:var(--blue);
+  border:3px solid var(--ink); border-radius:16px; box-shadow:0 6px 0 var(--ink)}
+.big:active{transform:translateY(4px); box-shadow:0 2px 0 var(--ink)}
+.big:disabled{opacity:.55}
+#steps{list-style:none; margin:0; padding:0}
+#steps li{display:grid; grid-template-columns:28px 1fr; gap:2px 8px; padding:8px 0; border-top:1px solid var(--paper-2)}
+#steps li:first-child{border-top:0}
+.st{grid-row:span 2; font-size:20px; line-height:1.3}
+.detail{color:var(--ink-soft); font-size:15px; overflow-wrap:anywhere}
+.who{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:10px 0}
+.who button{padding:6px 16px; border:2px solid var(--ink); border-radius:999px; background:var(--paper); font-weight:700}
+.who button[aria-pressed="true"]{background:var(--ink); color:#fff}
+.words{display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
+.words button{padding:12px 8px; border:3px solid var(--ink); border-radius:16px; background:var(--paper-2); box-shadow:0 4px 0 var(--ink)}
+.words button:active{transform:translateY(3px); box-shadow:0 1px 0 var(--ink)}
+.words button:disabled{opacity:.5}
+.words .emo{display:block; font-size:40px; line-height:1.2}
+.words b{font-size:20px}
+.words .listening{background:var(--warn-soft)}
+#attempts{list-style:none; margin:12px 0 0; padding:0; font-size:15px}
+#attempts li{padding:6px 0; border-top:1px solid var(--paper-2); overflow-wrap:anywhere}
+#sum{display:grid; grid-template-columns:auto 1fr; gap:8px 12px; margin:0}
+#sum dt{font-weight:800}
+#sum dd{margin:0; overflow-wrap:anywhere}
+.tag{display:inline-block; padding:0 8px; border-radius:8px; font-weight:800; font-size:15px; margin-right:6px}
+.tag.good{background:var(--good-soft); color:var(--good)}
+.tag.warn{background:var(--warn-soft); color:var(--warn)}
+.tag.bad{background:var(--oops-soft); color:var(--oops)}
+.hint{color:var(--ink-soft); font-size:15px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <h1>Dino Bricks 网络测试</h1>
+  <p class="lead">请连着家里的 Wi‑Fi，用 Safari 打开这个页面。点下面的按钮，大约 1 分钟。</p>
+  <button id="start" class="big">开始测试</button>
+
+  <section id="auto" class="card" hidden>
+    <h2>自动测试</h2>
+    <ol id="steps"></ol>
+  </section>
+
+  <section id="speech" class="card" hidden>
+    <h2>最后一步：说英语单词</h2>
+    <p>点一张卡片，然后对着 iPad 说上面的英文单词。第一次会问能不能用麦克风，请点「允许」。</p>
+    <p class="hint">大人先每个词试一次，再让孩子跟着说几次。</p>
+    <div class="who">现在说话的是：
+      <button type="button" data-who="adult" aria-pressed="true">大人</button>
+      <button type="button" data-who="child" aria-pressed="false">孩子</button>
+    </div>
+    <div class="words" id="words"></div>
+    <ul id="attempts"></ul>
+  </section>
+
+  <section id="summary" class="card" hidden>
+    <h2>结果</h2>
+    <dl id="sum"></dl>
+    <p id="saved" class="hint"></p>
+    <p><b>请把这一屏截图，发到微信。</b></p>
+  </section>
+</main>
+
+<script>
+const ENV = 'dino-bricks-d3gtr4flk52e70f86';
+const SDK = 'vendor/cloudbase-js-sdk-3.10.1/';
+const WORDS = [['dog', '🐶'], ['apple', '🍎'], ['red', '🔴'], ['elephant', '🐘']];
+const R = { v: 1, at: new Date().toISOString(), device: {}, pages: {}, cloud: {}, overseas: {}, voices: [], speech: { attempts: [] } };
+let db = null, col = null, reportId = null;
+
+const $ = id => document.getElementById(id);
+const ms = n => Math.round(n);
+const median = a => { const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length ? (s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2) : null; };
+const errText = e => (e && (e.message || e.msg || e.error || e.code)) || String(e);
+const withTimeout = (p, t, what) => Promise.race([p, new Promise((_, no) => setTimeout(() => no(new Error(what + '超时（' + t / 1000 + ' 秒）')), t))]);
+async function timed(fn) { const t = performance.now(); const v = await fn(); return [performance.now() - t, v]; }
+
+// Load the SDK right away (not on tap), and time it: this is the same download the game would need.
+const sdkStart = performance.now();
+const loadScript = src => new Promise((ok, no) => {
+  const s = document.createElement('script');
+  s.src = src; s.async = false;  // download in parallel, run in order
+  s.onload = ok; s.onerror = () => no(new Error('加载失败：' + src));
+  document.head.append(s);
+});
+const sdkReady = Promise.all(['cloudbase.js', 'cloudbase.auth.js', 'cloudbase.database.js'].map(f => loadScript(SDK + f)))
+  .then(() => performance.now() - sdkStart);
+sdkReady.catch(() => {});
+
+function step(label) {
+  const li = document.createElement('li');
+  li.innerHTML = '<span class="st">⏳</span><b></b><span class="detail"></span>';
+  li.querySelector('b').textContent = label;
+  $('steps').append(li);
+  const set = (mark, text) => { li.querySelector('.st').textContent = mark; li.querySelector('.detail').textContent = text || ''; };
+  return { ok: t => set('✅', t), warn: t => set('⚠️', t), bad: t => set('❌', t) };
+}
+
+function deviceInfo() {
+  const ua = navigator.userAgent;
+  return {
+    ua,
+    ios: ((ua.match(/OS (\d+)[_.](\d+)/) || []).slice(1).join('.')) || null,
+    safari: (ua.match(/Version\/([\d.]+)/) || [])[1] || null,
+    ipad: /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1),
+    standalone: !!navigator.standalone || matchMedia('(display-mode: standalone)').matches,
+    lang: navigator.language,
+    tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    screen: screen.width + 'x' + screen.height + '@' + devicePixelRatio,
+  };
+}
+
+async function testPages() {
+  const s = step('GitHub Pages 速度');
+  const nav = performance.getEntriesByType('navigation')[0];
+  if (nav) { R.pages.pageMs = ms(nav.responseEnd - nav.startTime); R.pages.firstByteMs = ms(nav.responseStart - nav.startTime); }
+  try {
+    const times = [];
+    let bytes = 0;
+    for (let i = 0; i < 3; i++) {
+      const [t, buf] = await timed(async () => {
+        const r = await withTimeout(fetch('probe.bin?t=' + Date.now() + i, { cache: 'no-store' }), 30000, '下载');
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.arrayBuffer();
+      });
+      times.push(t); bytes = buf.byteLength;
+    }
+    R.pages.downloadMs = times.map(ms);
+    R.pages.kbps = Math.round(bytes / 1024 / (median(times) / 1000));
+    s.ok('打开本页 ' + (R.pages.pageMs ?? '?') + ' ms，下载 ' + Math.round(bytes / 1024) + ' KB 用时 ' + ms(median(times)) + ' ms（约 ' + R.pages.kbps + ' KB/s）');
+  } catch (e) {
+    R.pages.error = errText(e);
+    s.bad(R.pages.error);
+  }
+}
+
+async function testCloud() {
+  let s = step('加载云开发 SDK');
+  try {
+    R.cloud.sdkMs = ms(await withTimeout(sdkReady, 90000, 'SDK 加载'));
+    s.ok(R.cloud.sdkMs + ' ms');
+  } catch (e) { R.cloud.error = errText(e); s.bad(R.cloud.error); return; }
+
+  s = step('匿名登录');
+  let auth;
+  try {
+    const app = cloudbase.init({ env: ENV });
+    auth = app.auth({ persistence: 'local' });
+    let reused = false, user = null;
+    const [t] = await timed(() => withTimeout((async () => {
+      try {
+        const { data } = await auth.getSession();
+        if (data && data.session) { reused = true; user = data.session.user; return; }
+      } catch (e) {}
+      const { data, error } = await auth.signInAnonymously({});
+      if (error) throw error;
+      user = data.user || (data.session && data.session.user);
+    })(), 20000, '登录'));
+    R.cloud.loginMs = ms(t); R.cloud.reusedLogin = reused; R.cloud.uid = user && user.id;
+    db = app.database();
+    col = db.collection('probe');
+    s.ok(R.cloud.loginMs + ' ms' + (reused ? '（沿用上次的身份）' : '（新身份）'));
+  } catch (e) { R.cloud.error = '登录失败：' + errText(e); s.bad(R.cloud.error); return; }
+
+  s = step('云数据库写入和读取（各 5 次）');
+  try {
+    const writes = [], reads = [], ids = [];
+    for (let i = 0; i < 5; i++) {
+      const [t, r] = await timed(() => withTimeout(col.add({ kind: 'ping', i, at: Date.now() }), 15000, '写入'));
+      writes.push(t); ids.push(r.id);
+    }
+    for (let i = 0; i < 5; i++) {
+      const [t, r] = await timed(() => withTimeout(col.doc(ids[i]).get(), 15000, '读取'));
+      if (!r.data || !r.data.length || r.data[0].i !== i) throw new Error('读回的数据不对');
+      reads.push(t);
+    }
+    R.cloud.writeMs = writes.map(ms); R.cloud.readMs = reads.map(ms);
+    s.ok('写入中位 ' + ms(median(writes)) + ' ms，读取中位 ' + ms(median(reads)) + ' ms');
+    ids.forEach(id => col.doc(id).remove().catch(() => {}));
+  } catch (e) { R.cloud.error = '读写失败：' + errText(e); s.bad(R.cloud.error); }
+}
+
+// Plan C reference only: is a Cloudflare-fronted site reachable from home at all?
+async function testOverseas() {
+  const s = step('参考：Cloudflare（备选方案）');
+  const times = [];
+  let err = null;
+  for (let i = 0; i < 3; i++) {
+    try {
+      const [t] = await timed(() => withTimeout(fetch('https://www.cloudflare.com/cdn-cgi/trace?t=' + Date.now() + i, { mode: 'no-cors', cache: 'no-store' }), 10000, '连接'));
+      times.push(t);
+    } catch (e) { err = errText(e); }
+  }
+  R.overseas.cloudflareMs = times.map(ms);
+  if (err) R.overseas.error = err;
+  if (times.length === 3) s.ok('中位 ' + ms(median(times)) + ' ms');
+  else if (times.length) s.warn('3 次里通了 ' + times.length + ' 次，中位 ' + ms(median(times)) + ' ms');
+  else s.bad('连不上：' + err);
+}
+
+function englishVoices() {
+  return new Promise(done => {
+    if (!('speechSynthesis' in window)) return done([]);
+    const get = () => { try { return (speechSynthesis.getVoices() || []).filter(v => /^en/i.test(v.lang)).map(v => v.name + ' (' + v.lang + ')'); } catch (e) { return []; } };
+    const now = get();
+    if (now.length) return done(now);
+    speechSynthesis.addEventListener('voiceschanged', () => done(get()), { once: true });
+    setTimeout(() => done(get()), 2000);
+  });
+}
+
+/* ---------- speech recognition ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const SR_HINTS = {
+  'not-allowed': '麦克风被拒绝了：请到 设置 → Safari → 麦克风，改成「询问」或「允许」，再刷新本页。',
+  'service-not-allowed': '语音识别没开：请到 设置 → 通用 → 键盘，打开「启用听写」，再刷新本页。',
+  'network': '连不上语音识别服务。',
+  'no-speech': '没听到声音，靠近一点再试。',
+  'no-result': '没听清，再试一次。',
+  'timeout': '没听清，再试一次。',
+  'audio-capture': '找不到麦克风。',
+};
+let who = 'adult', busy = false;
+
+function listen(word, btn) {
+  if (busy) return;
+  busy = true;
+  document.querySelectorAll('.words button').forEach(b => { b.disabled = b !== btn; });
+  btn.classList.add('listening');
+  btn.querySelector('small').textContent = '正在听……';
+  const t0 = performance.now();
+  let done = false, timer = 0, rec = null;
+  const finish = att => {
+    if (done) return;
+    done = true; clearTimeout(timer);
+    try { rec && rec.abort(); } catch (e) {}
+    Object.assign(att, { word, who, ms: ms(performance.now() - t0) });
+    R.speech.attempts.push(att);
+    showAttempt(att);
+    btn.classList.remove('listening');
+    btn.querySelector('small').textContent = '点一下，说出来';
+    document.querySelectorAll('.words button').forEach(b => { b.disabled = false; });
+    busy = false;
+    renderSummary(); save();
+  };
+  try {
+    rec = new SR();
+    rec.lang = 'en-US'; rec.interimResults = false; rec.maxAlternatives = 5; rec.continuous = false;
+    rec.onresult = e => {
+      const alts = [...e.results[0]].map(a => ({ t: a.transcript.trim(), c: Math.round((a.confidence || 0) * 100) / 100 }));
+      const hit = alts.some(a => a.t.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).includes(word));
+      finish({ ok: hit, alts });
+    };
+    rec.onerror = e => finish({ ok: false, error: e.error || 'error' });
+    rec.onend = () => finish({ ok: false, error: 'no-result' });
+    timer = setTimeout(() => finish({ ok: false, error: 'timeout' }), 10000);
+    rec.start();
+  } catch (e) { finish({ ok: false, error: errText(e) }); }
+}
+
+function showAttempt(a) {
+  const li = document.createElement('li');
+  const heard = a.alts ? '听成：' + a.alts.map(x => x.t + (x.c ? ' ' + x.c : '')).join(' / ') : (SR_HINTS[a.error] || '出错：' + a.error);
+  li.textContent = (a.ok ? '✅ ' : '❌ ') + (a.who === 'child' ? '孩子' : '大人') + ' 说 ' + a.word + ' — ' + heard;
+  $('attempts').prepend(li);
+}
+
+function setupSpeech() {
+  $('speech').hidden = false;
+  if (!SR) {
+    $('words').outerHTML = '<p><span class="tag bad">不支持</span>这台 iPad 的 Safari 没有语音识别功能。</p>';
+    document.querySelector('#speech .who').hidden = true;
+    return;
+  }
+  for (const [w, emo] of WORDS) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = '<span class="emo"></span><b></b><br><small>点一下，说出来</small>';
+    b.querySelector('.emo').textContent = emo;
+    b.querySelector('b').textContent = w;
+    b.onclick = () => listen(w, b);
+    $('words').append(b);
+  }
+  document.querySelectorAll('.who button').forEach(b => b.onclick = () => {
+    who = b.dataset.who;
+    document.querySelectorAll('.who button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  });
+}
+
+/* ---------- summary + upload ---------- */
+function grade(v, good, ok) { return v == null ? 'bad' : v <= good ? 'good' : v <= ok ? 'warn' : 'bad'; }
+function row(label, cls, word, text) {
+  const dt = document.createElement('dt'), dd = document.createElement('dd'), tag = document.createElement('span');
+  dt.textContent = label;
+  tag.className = 'tag ' + cls; tag.textContent = word;
+  dd.append(tag, document.createTextNode(text));
+  $('sum').append(dt, dd);
+}
+const WORD = { good: '好', warn: '一般', bad: '不行' };
+
+function renderSummary() {
+  $('summary').hidden = false;
+  $('sum').textContent = '';
+  const d = R.device;
+  row('设备', 'good', d.ipad ? 'iPad' : '其他', ' iOS ' + (d.ios || d.safari || '?') + (d.standalone ? '，主屏幕模式' : '，Safari'));
+  if (R.pages.error) row('网页', 'bad', WORD.bad, ' ' + R.pages.error);
+  else { const g = grade(R.pages.pageMs, 2000, 6000); row('网页', g, WORD[g], ' 打开 ' + R.pages.pageMs + ' ms，下载约 ' + R.pages.kbps + ' KB/s'); }
+  if (R.cloud.error) row('云存档', 'bad', WORD.bad, ' ' + R.cloud.error);
+  else if (R.cloud.writeMs) {
+    const w = median(R.cloud.writeMs), r = median(R.cloud.readMs), g = grade(Math.max(w, r), 500, 1500);
+    row('云存档', g, WORD[g], ' 登录 ' + R.cloud.loginMs + ' ms，写入 ' + ms(w) + ' ms，读取 ' + ms(r) + ' ms（SDK 加载 ' + R.cloud.sdkMs + ' ms）');
+  }
+  const cf = R.overseas.cloudflareMs || [];
+  const gc = cf.length === 3 ? grade(median(cf), 800, 2500) : cf.length ? 'warn' : 'bad';
+  row('Cloudflare', gc, WORD[gc], cf.length ? ' 3 次通了 ' + cf.length + ' 次，中位 ' + ms(median(cf)) + ' ms' : ' 连不上');
+  row('英语语音', R.voices.length ? 'good' : 'bad', R.voices.length ? '有' : '没有', ' ' + (R.voices.slice(0, 3).join('、') || '没有英文发音') + (R.voices.length > 3 ? ' 等 ' + R.voices.length + ' 个' : ''));
+  if (!SR) row('语音识别', 'bad', '不支持', '');
+  else {
+    const at = R.speech.attempts, n = a => a.filter(x => x.ok).length + '/' + a.length;
+    const adult = at.filter(a => a.who === 'adult'), child = at.filter(a => a.who === 'child');
+    const g = !at.length ? 'warn' : at.some(a => a.ok) ? 'good' : 'bad';
+    row('语音识别', g, at.length ? (at.some(a => a.ok) ? '能用' : '没认出') : '还没试', at.length ? ' 大人认对 ' + n(adult) + '，孩子认对 ' + n(child) : ' 请在上面试几个词');
+  }
+}
+
+let saving = Promise.resolve();
+function save() {
+  if (!col) { $('saved').textContent = '没能连上云端，结果只在这一屏上。'; return; }
+  saving = saving.then(async () => {
+    try {
+      if (!reportId) reportId = (await col.add({ kind: 'report', ...R })).id;
+      else await col.doc(reportId).update({ speech: db.command.set(R.speech) });
+      $('saved').textContent = '✅ 结果已保存到云端（编号 ' + reportId.slice(-6) + '）';
+    } catch (e) { $('saved').textContent = '⚠️ 结果没能上传：' + errText(e); }
+  });
+}
+
+$('start').onclick = async () => {
+  $('start').disabled = true;
+  $('start').textContent = '测试中……';
+  $('auto').hidden = false;
+  R.device = deviceInfo();
+  await testPages();
+  await testCloud();
+  await testOverseas();
+  R.voices = await englishVoices();
+  $('start').textContent = '自动测试完成';
+  setupSpeech();
+  renderSummary();
+  save();
+};
+</script>
+</body>
+</html>

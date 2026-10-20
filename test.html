@@ -58,7 +58,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 <body>
 <main>
   <h1>Dino Bricks 网络测试</h1>
-  <p class="lead">请连着家里的 Wi‑Fi，用 Safari 打开这个页面。点下面的按钮，大约 1 分钟。</p>
+  <p class="lead">请用孩子玩游戏的那台 iPad，连着家里的 Wi‑Fi，在 Safari 里打开这个页面。点下面的按钮，大约 1 分钟。</p>
   <button id="start" class="big">开始测试</button>
 
   <section id="auto" class="card" hidden>
@@ -136,27 +136,29 @@ function deviceInfo() {
 }
 
 async function testPages() {
-  const s = step('GitHub Pages 速度');
+  const s = step('GitHub Pages 速度（下载 5 次）');
   const nav = performance.getEntriesByType('navigation')[0];
   if (nav) { R.pages.pageMs = ms(nav.responseEnd - nav.startTime); R.pages.firstByteMs = ms(nav.responseStart - nav.startTime); }
-  try {
-    const times = [];
-    let bytes = 0;
-    for (let i = 0; i < 3; i++) {
+  R.pages.sw = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+  // keep going after a failure: whether it fails sometimes or always is the point
+  const times = [], errors = [];
+  let bytes = 0;
+  for (let i = 0; i < 5; i++) {
+    try {
       const [t, buf] = await timed(async () => {
         const r = await withTimeout(fetch('probe.bin?t=' + Date.now() + i, { cache: 'no-store' }), 30000, '下载');
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.arrayBuffer();
       });
       times.push(t); bytes = buf.byteLength;
-    }
-    R.pages.downloadMs = times.map(ms);
-    R.pages.kbps = Math.round(bytes / 1024 / (median(times) / 1000));
-    s.ok('打开本页 ' + (R.pages.pageMs ?? '?') + ' ms，下载 ' + Math.round(bytes / 1024) + ' KB 用时 ' + ms(median(times)) + ' ms（约 ' + R.pages.kbps + ' KB/s）');
-  } catch (e) {
-    R.pages.error = errText(e);
-    s.bad(R.pages.error);
+    } catch (e) { errors.push(errText(e)); }
   }
+  R.pages.downloadMs = times.map(ms); R.pages.errors = errors;
+  const open = '打开本页 ' + (R.pages.pageMs ?? '?') + ' ms，';
+  if (!times.length) { R.pages.error = errors[0]; s.bad(open + '5 次下载全部失败：' + errors[0]); return; }
+  R.pages.kbps = Math.round(bytes / 1024 / (median(times) / 1000));
+  const text = open + '5 次下载成功 ' + times.length + ' 次，每次 ' + Math.round(bytes / 1024) + ' KB，中位 ' + ms(median(times)) + ' ms（约 ' + R.pages.kbps + ' KB/s）' + (errors.length ? '；失败原因：' + errors[0] : '');
+  errors.length ? s.warn(text) : s.ok(text);
 }
 
 async function testCloud() {
@@ -270,22 +272,31 @@ function listen(word, btn) {
   };
   try {
     rec = new SR();
-    rec.lang = 'en-US'; rec.interimResults = false; rec.maxAlternatives = 5; rec.continuous = false;
+    rec.lang = 'en-US'; rec.interimResults = true; rec.maxAlternatives = 5; rec.continuous = false;
+    let alts = null, audio = false, speech = false;
+    const judge = () => ({ ok: alts.some(a => a.t.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).includes(word)), alts });
+    const miss = error => alts ? judge() : { ok: false, error, audio, speech };
+    rec.onaudiostart = () => { audio = true; };
+    rec.onspeechstart = () => { speech = true; };
     rec.onresult = e => {
-      const alts = [...e.results[0]].map(a => ({ t: a.transcript.trim(), c: Math.round((a.confidence || 0) * 100) / 100 }));
-      const hit = alts.some(a => a.t.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).includes(word));
-      finish({ ok: hit, alts });
+      const rs = [...e.results];
+      alts = rs.length === 1 ? [...rs[0]].map(a => ({ t: a.transcript.trim(), c: Math.round((a.confidence || 0) * 100) / 100 }))
+                             : [{ t: rs.map(r => r[0].transcript).join(' ').trim(), c: 0 }];
+      if (rs.every(r => r.isFinal)) finish(judge());
     };
-    rec.onerror = e => finish({ ok: false, error: e.error || 'error' });
-    rec.onend = () => finish({ ok: false, error: 'no-result' });
-    timer = setTimeout(() => finish({ ok: false, error: 'timeout' }), 10000);
+    rec.onerror = e => finish({ ok: false, error: e.error || 'error', audio, speech });
+    // iOS can end without a final result: give a late one a moment, then use what we heard so far
+    rec.onend = () => setTimeout(() => finish(miss('no-result')), 400);
+    timer = setTimeout(() => finish(miss('timeout')), 10000);
     rec.start();
   } catch (e) { finish({ ok: false, error: errText(e) }); }
 }
 
 function showAttempt(a) {
   const li = document.createElement('li');
-  const heard = a.alts ? '听成：' + a.alts.map(x => x.t + (x.c ? ' ' + x.c : '')).join(' / ') : (SR_HINTS[a.error] || '出错：' + a.error);
+  const mic = a.audio ? (a.speech ? '听到说话了但没认出' : '麦克风开了但没听到说话') : '麦克风没有启动';
+  const heard = a.alts ? '听成：' + a.alts.map(x => x.t + (x.c ? ' ' + x.c : '')).join(' / ')
+    : (SR_HINTS[a.error] || '出错：' + a.error) + '（' + a.error + '，' + (a.ms / 1000).toFixed(1) + ' 秒，' + mic + '）';
   li.textContent = (a.ok ? '✅ ' : '❌ ') + (a.who === 'child' ? '孩子' : '大人') + ' 说 ' + a.word + ' — ' + heard;
   $('attempts').prepend(li);
 }
@@ -327,9 +338,12 @@ function renderSummary() {
   $('summary').hidden = false;
   $('sum').textContent = '';
   const d = R.device;
-  row('设备', 'good', d.ipad ? 'iPad' : '其他', ' iOS ' + (d.ios || d.safari || '?') + (d.standalone ? '，主屏幕模式' : '，Safari'));
-  if (R.pages.error) row('网页', 'bad', WORD.bad, ' ' + R.pages.error);
-  else { const g = grade(R.pages.pageMs, 2000, 6000); row('网页', g, WORD[g], ' 打开 ' + R.pages.pageMs + ' ms，下载约 ' + R.pages.kbps + ' KB/s'); }
+  row('设备', d.ipad ? 'good' : 'warn', d.ipad ? 'iPad' : /iPhone/.test(d.ua) ? 'iPhone' : '其他', ' iOS ' + (d.ios || d.safari || '?') + (d.standalone ? '，主屏幕模式' : '，Safari'));
+  if (R.pages.error) row('网页', 'bad', WORD.bad, ' 打开 ' + R.pages.pageMs + ' ms，5 次下载全部失败：' + R.pages.error);
+  else {
+    const fails = R.pages.errors.length, g = fails ? 'warn' : grade(R.pages.pageMs, 2000, 6000);
+    row('网页', g, WORD[g], ' 打开 ' + R.pages.pageMs + ' ms，下载成功 ' + (5 - fails) + '/5，约 ' + R.pages.kbps + ' KB/s');
+  }
   if (R.cloud.error) row('云存档', 'bad', WORD.bad, ' ' + R.cloud.error);
   else if (R.cloud.writeMs) {
     const w = median(R.cloud.writeMs), r = median(R.cloud.readMs), g = grade(Math.max(w, r), 500, 1500);

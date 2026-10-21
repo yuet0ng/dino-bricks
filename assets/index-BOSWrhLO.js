@@ -40,7 +40,7 @@
       <div class="row"><button class="sbtn" type="button" data-act="test">测试发音</button><span class="muted">当前声音：${L?P(R?`${R.name}（${R.lang}）`:`系统默认英语`):`这个浏览器不支持朗读`}</span></div>
       <div class="tip">听不到声音：检查 iPad 的音量和侧边静音开关。<br>发音不自然：在 iPad「设置 → 辅助功能 → 朗读内容 → 声音 → 英语」里下载 Samantha（增强版），然后重新打开这个页面。</div>
     </section>
-    <p class="muted">版本 0.5.0（发布新版后，iPad 要打开两次才会换上）</p>
+    <p class="muted">版本 0.5.1（发布新版后，iPad 要打开两次才会换上）</p>
   </div>`,zn()}var Vn=e=>{let t=new Date(e);return`${t.getMonth()+1}月${t.getDate()}日 ${Je(t.getHours())}:${Je(t.getMinutes())}`};function Hn(){let e=jn();if(!e)return``;let t=e.lastSync?`（上次同步：${Vn(e.lastSync)}）`:``;return{syncing:`正在同步…`,ok:`已同步：${Vn(e.lastSync)}`,offline:`现在没有网络，联网后会自动同步。${t}`,busy:`云端暂时忙，稍后会自动再试。${t}`,not_found:`云端找不到这个家庭码。请在下面输入正确的家庭码。`,error:`同步出错，稍后会自动再试。${t}`}[e.status]||`这台设备上还没有学习记录。孩子开始玩（学了新词或得到星星）、并且联网后，会自动生成家庭码，进度会自动存到云端。如果孩子以前在别的设备上玩过，请在下面输入那边的家庭码。`}function Un(e){let t=K.msg?`<p class="io-msg${K.err?` err`:``}">${P(K.msg)}</p>`:``;return`<section><h3>云存档</h3>
       ${e.code?`<div class="row"><span>家庭码</span><b class="fcode">${hn(e.code)}</b><button class="sbtn" type="button" data-act="cloud-copy">复制</button><button class="sbtn ghost" type="button" data-act="cloud-sync">现在同步</button></div>`:``}
       <p class="muted" id="cloudStatus">${Hn()}</p>

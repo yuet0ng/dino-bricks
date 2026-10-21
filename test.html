@@ -87,11 +87,12 @@ button{font:inherit; color:inherit; cursor:pointer}
 </main>
 
 <script>
-const ENV = 'dino-bricks-d3gtr4flk52e70f86';
-const SDK = 'vendor/cloudbase-js-sdk-3.10.1/';
+// The same HTTP API and cloud function the game uses (src/core/cloud.js); results go to the PRIVATE "probe" collection.
+const API = 'https://dino-bricks-d3gtr4flk52e70f86.api.tcloudbasegateway.com';
+const PROBE = '/v1/database/instances/(default)/databases/(default)/collections/probe/documents';
 const WORDS = [['dog', '🐶'], ['apple', '🍎'], ['red', '🔴'], ['elephant', '🐘']];
-const R = { v: 1, at: new Date().toISOString(), device: {}, pages: {}, cloud: {}, overseas: {}, voices: [], speech: { attempts: [] } };
-let db = null, col = null, reportId = null;
+const R = { v: 2, at: new Date().toISOString(), device: {}, pages: {}, cloud: {}, overseas: {}, voices: [], speech: { attempts: [] } };
+let token = null, reportId = null;
 
 const $ = id => document.getElementById(id);
 const ms = n => Math.round(n);
@@ -100,17 +101,24 @@ const errText = e => (e && (e.message || e.msg || e.error || e.code)) || String(
 const withTimeout = (p, t, what) => Promise.race([p, new Promise((_, no) => setTimeout(() => no(new Error(what + '超时（' + t / 1000 + ' 秒）')), t))]);
 async function timed(fn) { const t = performance.now(); const v = await fn(); return [performance.now() - t, v]; }
 
-// Load the SDK right away (not on tap), and time it: this is the same download the game would need.
-const sdkStart = performance.now();
-const loadScript = src => new Promise((ok, no) => {
-  const s = document.createElement('script');
-  s.src = src; s.async = false;  // download in parallel, run in order
-  s.onload = ok; s.onerror = () => no(new Error('加载失败：' + src));
-  document.head.append(s);
-});
-const sdkReady = Promise.all(['cloudbase.js', 'cloudbase.auth.js', 'cloudbase.database.js'].map(f => loadScript(SDK + f)))
-  .then(() => performance.now() - sdkStart);
-sdkReady.catch(() => {});
+async function api(method, path, body, headers = { Authorization: 'Bearer ' + token }) {
+  const r = await fetch(API + path, { method, headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body) });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error('HTTP ' + r.status + (data.code ? '，' + data.code : ''));
+  return data;
+}
+
+// Its own device id, kept so repeat runs sign in as the same anonymous user; the game's storage keys are left alone.
+function deviceId() {
+  const KEY = 'dino-bricks-test-device';
+  let id = null;
+  try { id = localStorage.getItem(KEY); } catch (e) {}
+  if (!id) {
+    id = 'probe-' + Math.random().toString(36).slice(2, 12);
+    try { localStorage.setItem(KEY, id); } catch (e) {}
+  }
+  return id;
+}
 
 function step(label) {
   const li = document.createElement('li');
@@ -162,49 +170,27 @@ async function testPages() {
 }
 
 async function testCloud() {
-  let s = step('加载云开发 SDK');
+  let s = step('匿名登录');
   try {
-    R.cloud.sdkMs = ms(await withTimeout(sdkReady, 90000, 'SDK 加载'));
-    s.ok(R.cloud.sdkMs + ' ms');
-  } catch (e) { R.cloud.error = errText(e); s.bad(R.cloud.error); return; }
-
-  s = step('匿名登录');
-  let auth;
-  try {
-    const app = cloudbase.init({ env: ENV });
-    auth = app.auth({ persistence: 'local' });
-    let reused = false, user = null;
-    const [t] = await timed(() => withTimeout((async () => {
-      try {
-        const { data } = await auth.getSession();
-        if (data && data.session) { reused = true; user = data.session.user; return; }
-      } catch (e) {}
-      const { data, error } = await auth.signInAnonymously({});
-      if (error) throw error;
-      user = data.user || (data.session && data.session.user);
-    })(), 20000, '登录'));
-    R.cloud.loginMs = ms(t); R.cloud.reusedLogin = reused; R.cloud.uid = user && user.id;
-    db = app.database();
-    col = db.collection('probe');
-    s.ok(R.cloud.loginMs + ' ms' + (reused ? '（沿用上次的身份）' : '（新身份）'));
+    const [t, r] = await timed(() => withTimeout(api('POST', '/auth/v1/signin/anonymously', {}, { 'x-device-id': deviceId() }), 20000, '登录'));
+    if (!r.access_token) throw new Error('没有拿到登录凭证');
+    token = r.access_token;
+    R.cloud.loginMs = ms(t);
+    s.ok(R.cloud.loginMs + ' ms');
   } catch (e) { R.cloud.error = '登录失败：' + errText(e); s.bad(R.cloud.error); return; }
 
-  s = step('云数据库写入和读取（各 5 次）');
+  // The first call may include the function's cold start, so it is shown apart from the median.
+  s = step('调用云存档函数（5 次）');
   try {
-    const writes = [], reads = [], ids = [];
+    const times = [];
     for (let i = 0; i < 5; i++) {
-      const [t, r] = await timed(() => withTimeout(col.add({ kind: 'ping', i, at: Date.now() }), 15000, '写入'));
-      writes.push(t); ids.push(r.id);
+      const [t, r] = await timed(() => withTimeout(api('POST', '/v1/functions/dino-save', { action: 'ping' }), 15000, '调用'));
+      if (!r.ok) throw new Error(r.error || r.code || '返回的数据不对');
+      times.push(t);
     }
-    for (let i = 0; i < 5; i++) {
-      const [t, r] = await timed(() => withTimeout(col.doc(ids[i]).get(), 15000, '读取'));
-      if (!r.data || !r.data.length || r.data[0].i !== i) throw new Error('读回的数据不对');
-      reads.push(t);
-    }
-    R.cloud.writeMs = writes.map(ms); R.cloud.readMs = reads.map(ms);
-    s.ok('写入中位 ' + ms(median(writes)) + ' ms，读取中位 ' + ms(median(reads)) + ' ms');
-    ids.forEach(id => col.doc(id).remove().catch(() => {}));
-  } catch (e) { R.cloud.error = '读写失败：' + errText(e); s.bad(R.cloud.error); }
+    R.cloud.pingMs = times.map(ms);
+    s.ok('第一次 ' + R.cloud.pingMs[0] + ' ms，中位 ' + ms(median(times)) + ' ms');
+  } catch (e) { R.cloud.error = '调用失败：' + errText(e); s.bad(R.cloud.error); }
 }
 
 // Plan C reference only: is a Cloudflare-fronted site reachable from home at all?
@@ -345,9 +331,9 @@ function renderSummary() {
     row('网页', g, WORD[g], ' 打开 ' + R.pages.pageMs + ' ms，下载成功 ' + (5 - fails) + '/5，约 ' + R.pages.kbps + ' KB/s');
   }
   if (R.cloud.error) row('云存档', 'bad', WORD.bad, ' ' + R.cloud.error);
-  else if (R.cloud.writeMs) {
-    const w = median(R.cloud.writeMs), r = median(R.cloud.readMs), g = grade(Math.max(w, r), 500, 1500);
-    row('云存档', g, WORD[g], ' 登录 ' + R.cloud.loginMs + ' ms，写入 ' + ms(w) + ' ms，读取 ' + ms(r) + ' ms（SDK 加载 ' + R.cloud.sdkMs + ' ms）');
+  else if (R.cloud.pingMs) {
+    const p = median(R.cloud.pingMs), g = grade(Math.max(R.cloud.loginMs, p), 800, 2000);
+    row('云存档', g, WORD[g], ' 登录 ' + R.cloud.loginMs + ' ms，调用第一次 ' + R.cloud.pingMs[0] + ' ms、中位 ' + ms(p) + ' ms');
   }
   const cf = R.overseas.cloudflareMs || [];
   const gc = cf.length === 3 ? grade(median(cf), 800, 2500) : cf.length ? 'warn' : 'bad';
@@ -364,11 +350,11 @@ function renderSummary() {
 
 let saving = Promise.resolve();
 function save() {
-  if (!col) { $('saved').textContent = '没能连上云端，结果只在这一屏上。'; return; }
+  if (!token) { $('saved').textContent = '没能连上云端，结果只在这一屏上。'; return; }
   saving = saving.then(async () => {
     try {
-      if (!reportId) reportId = (await col.add({ kind: 'report', ...R })).id;
-      else await col.doc(reportId).update({ speech: db.command.set(R.speech) });
+      if (!reportId) reportId = (await api('POST', PROBE, { data: [{ kind: 'report', ...R }] })).insertedIds[0];
+      else await api('PATCH', PROBE + '/' + reportId, { data: { $set: { speech: R.speech } } });
       $('saved').textContent = '✅ 结果已保存到云端（编号 ' + reportId.slice(-6) + '）';
     } catch (e) { $('saved').textContent = '⚠️ 结果没能上传：' + errText(e); }
   });

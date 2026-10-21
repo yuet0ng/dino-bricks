@@ -13,8 +13,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="icon" href="./icon-192.png">
-  <script type="module" crossorigin src="./assets/index-u3G8cBgy.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-eIEQuchj.css">
+  <script type="module" crossorigin src="./assets/index-BwjnFnN5.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-GWvDIV_f.css">
 </head>
 <body>
 <div id="app">
@@ -41,7 +41,7 @@
     <section id="scr-start" class="screen center">
       <div class="hero">
         <div class="hero-pic">
-          <span class="emoji dino">🦖</span>
+          <div class="dino me-art" id="startAvatar"></div>
           <div class="hero-bricks" aria-hidden="true">
             <i style="--c:var(--yellow);--w:96px"></i>
             <i style="--c:var(--blue);--w:132px"></i>
@@ -59,11 +59,14 @@
 
     <section id="scr-home" class="screen" hidden>
       <div class="home">
-        <aside class="tower-card" aria-label="我的积木塔">
+        <aside class="tower-card" aria-label="我的恐龙和积木塔">
+          <button class="me" type="button" data-game="dino" aria-label="我的恐龙"><span class="me-art" id="homeAvatar"></span></button>
+          <div class="lvlrow" aria-label="等级"><span class="lvl" id="homeLevel">Lv 1</span><span class="lvlbar"><em id="homeLevelBar"></em></span></div>
+          <div class="total"><span class="emoji">⭐</span><b id="walletStars">0</b></div>
+          <button class="goal" type="button" id="homeGoal" data-game="dino" hidden></button>
           <div class="tower-label"><b id="brickCount">0</b><span>/10</span></div>
-          <div class="total"><span class="emoji">⭐</span><b id="totalStars">0</b></div>
           <div class="tower" id="tower"></div>
-          <p class="tower-note">每答对一题加一块积木<br>搭满 10 块，换一张新贴纸</p>
+          <p class="tower-note">答对一题加一块积木<br>搭满 10 块送新贴纸<br>贴纸集齐了送星星</p>
         </aside>
         <div class="games">
           <button class="game" type="button" data-game="learn" style="--c:var(--yellow);--fg:var(--ink)">
@@ -86,8 +89,13 @@
             <span class="pic emoji">🙈</span>
             <span class="txt"><span class="h">What's Missing?</span><span class="zh">少了哪一个</span></span>
           </button>
-          <button class="game wide" type="button" data-game="album" style="--c:var(--purple)">
-            <span class="studs"><i></i><i></i><i></i><i></i><i></i></span>
+          <button class="game" type="button" data-game="dino" style="--c:var(--orange)">
+            <span class="studs"><i></i><i></i><i></i></span>
+            <span class="pic me-art" id="shopPreview"></span>
+            <span class="txt"><span class="h">My Dino</span><span class="zh">装扮和商店</span></span>
+          </button>
+          <button class="game" type="button" data-game="album" style="--c:var(--purple)">
+            <span class="studs"><i></i><i></i><i></i></span>
             <span class="pic emoji" id="albumPreview">🏆</span>
             <span class="txt"><span class="h">My Stickers</span><span class="zh" id="albumZh">我的贴纸</span></span>
           </button>
@@ -97,14 +105,28 @@
 
     <section id="scr-play" class="screen" hidden></section>
 
+    <section id="scr-dino" class="screen" hidden>
+      <div class="room">
+        <div class="room-stage">
+          <div class="room-dino me-art" id="roomAvatar"></div>
+          <div class="room-info"><span class="total"><span class="emoji">⭐</span><b id="roomWallet">0</b></span><span class="lvl" id="roomLevel">Lv 1</span></div>
+          <div class="room-act" id="roomAct"></div>
+        </div>
+        <div class="room-shop">
+          <div class="tabs" id="roomTabs" role="tablist" aria-label="部位"></div>
+          <div class="items" id="roomItems"></div>
+        </div>
+      </div>
+    </section>
+
     <section id="scr-album" class="screen" hidden>
       <div class="album-head"><h2 class="title small">My Stickers</h2><p class="sub" id="albumCount"></p></div>
-      <div class="album" id="album"></div>
+      <div id="album"></div>
     </section>
 
     <section id="scr-done" class="screen center" hidden>
       <div class="hero">
-        <div class="hero-pic"><span class="emoji dino">🦖</span><span class="zz" aria-hidden="true">z z</span></div>
+        <div class="hero-pic"><div class="dino me-art" id="doneAvatar"></div><span class="zz" aria-hidden="true">z z</span></div>
         <h1 class="title small">See you tomorrow!</h1>
         <p class="sub">今天的时间用完啦，明天再来玩！</p>
         <div class="today-stars" id="doneStars"></div>
@@ -127,9 +149,21 @@
   <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="stickerTitle">
     <h2 id="stickerTitle">New sticker!</h2>
     <div class="sticker-stage"><div class="sun"></div><span class="emoji sticker-big" id="stickerBig">🦖</span></div>
-    <p>积木塔搭好啦，得到一张新贴纸！</p>
+    <p id="stickerNote">积木塔搭好啦，得到一张新贴纸！</p>
     <button class="btn go" id="stickerOk" type="button">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>收下</span>
+    </button>
+  </div>
+</div>
+
+<div class="overlay" id="levelOverlay" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="levelTitle">
+    <h2 id="levelTitle">Level up!</h2>
+    <div class="sticker-stage"><div class="sun"></div><div class="level-dino me-art" id="levelAvatar"></div><span class="lvl big" id="levelNum">2</span></div>
+    <p id="levelNote">升级啦！</p>
+    <div class="unlocks" id="levelUnlocks"></div>
+    <button class="btn go" id="levelOk" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>好的</span>
     </button>
   </div>
 </div>

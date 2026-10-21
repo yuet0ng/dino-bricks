@@ -13,8 +13,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="icon" href="./icon-192.png">
-  <script type="module" crossorigin src="./assets/index-BOSWrhLO.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-CIT2a_LY.css">
+  <script type="module" crossorigin src="./assets/index-DdlRcVU5.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-B25vTbdf.css">
 </head>
 <body>
 <div id="app">
@@ -25,6 +25,9 @@
     <div class="logo" id="logo"><span class="mark" aria-hidden="true"></span><span>Dino <b>Bricks</b></span></div>
     <div class="dots" id="dots" hidden></div>
     <div class="bar-right">
+      <button class="icon-btn" id="pauseBtn" type="button" aria-label="暂停，休息一会" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/></svg>
+      </button>
       <div class="mini-tower" id="miniTower" aria-label="积木进度" hidden></div>
       <div class="pill timer" id="timer" aria-label="今天剩余时间">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 9v4l3 2M9 3h6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
@@ -134,6 +137,22 @@
       </div>
     </section>
   </main>
+</div>
+
+<div class="pause-overlay" id="pauseOverlay" hidden>
+  <div class="pause-card" role="dialog" aria-modal="true" aria-labelledby="pauseTitle" aria-describedby="pauseNote">
+    <div class="pause-scene" aria-hidden="true">
+      <span class="pause-cloud cloud-one"></span><span class="pause-cloud cloud-two"></span>
+      <span class="pause-zzz">z z z</span>
+      <div class="pause-avatar me-art" id="pauseAvatar"></div>
+      <span class="pause-shadow"></span>
+    </div>
+    <h2 id="pauseTitle">休息一会</h2>
+    <p id="pauseNote">准备好了，再一起玩</p>
+    <button class="btn go" id="resumeBtn" type="button" aria-label="继续游戏">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.8v14.4L19 12z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>继续</span>
+    </button>
+  </div>
 </div>
 
 <div class="overlay" id="resultOverlay" hidden>

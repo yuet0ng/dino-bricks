@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Dino Bricks 说英语测试</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../icon-192.png">
+<link rel="apple-touch-icon" href="../icon-180.png">
+<style>
+:root{
+  --mat:#BCE2CC; --ink:#1F2A4D; --ink-soft:#56627F; --paper:#FFFFFF; --paper-2:#F1F7F3;
+  --good:#2FA866; --good-soft:#DCF3E6; --warn:#C77700; --warn-soft:#FFF1D6; --oops:#E5483F; --oops-soft:#FCE3E1;
+  --blue:#2F74D9;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--mat); color:var(--ink); font:17px/1.5 "PingFang SC","Hiragino Sans GB",system-ui,sans-serif;
+  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+main{max-width:720px; margin:0 auto; padding:20px 16px 48px}
+h1{font-size:26px; margin:8px 0 4px}
+h2{font-size:20px; margin:0 0 8px}
+p{margin:6px 0}
+.card{background:var(--paper); border:3px solid var(--ink); border-radius:18px; padding:16px; margin-top:16px; box-shadow:0 5px 0 var(--ink)}
+.lead,.hint{color:var(--ink-soft)}
+.hint{font-size:15px}
+button{font:inherit; color:inherit; cursor:pointer}
+.row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0}
+.row b{min-width:5em}
+.seg button,.pill{padding:6px 16px; border:2px solid var(--ink); border-radius:999px; background:var(--paper); font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--ink); color:#fff}
+.words{display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:10px; margin-top:10px}
+.word{position:relative; aspect-ratio:1; border:3px solid var(--ink); border-radius:16px; background:var(--paper-2); box-shadow:0 4px 0 var(--ink);
+  display:grid; place-items:center; padding:0; -webkit-user-select:none; user-select:none}
+.word:active{transform:translateY(3px); box-shadow:0 1px 0 var(--ink)}
+.word:disabled{opacity:.45}
+.word.busy{background:var(--warn-soft); opacity:1}
+.word.busy::after{content:"🎤"; position:absolute; right:4px; top:2px; font-size:22px; animation:pulse .8s ease-in-out infinite alternate}
+.word.heard.busy::after{content:"🗣️"}
+.word .n{position:absolute; left:6px; bottom:2px; font-size:13px; font-weight:800; color:var(--ink-soft)}
+.emo{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif; font-size:52px; line-height:1}
+.blob{width:58%; aspect-ratio:1; border:3px solid var(--ink); border-radius:50%}
+.num{font-size:52px; font-weight:900; color:var(--blue); line-height:1}
+@keyframes pulse{from{transform:scale(.85)}to{transform:scale(1.15)}}
+#log{list-style:none; margin:12px 0 0; padding:0; font-size:15px}
+#log li{display:grid; grid-template-columns:auto 1fr; gap:2px 10px; padding:8px 0; border-top:1px solid var(--paper-2); overflow-wrap:anywhere}
+#log .v{font-size:22px; grid-row:span 2}
+#log small{color:var(--ink-soft)}
+#sum{display:grid; grid-template-columns:auto 1fr; gap:6px 12px; margin:0}
+#sum dt{font-weight:800}
+#sum dd{margin:0}
+.big{display:block; width:100%; margin-top:12px; padding:14px; font-size:20px; font-weight:800; color:#fff; background:var(--blue);
+  border:3px solid var(--ink); border-radius:16px; box-shadow:0 5px 0 var(--ink)}
+.note{background:var(--warn-soft); border-radius:12px; padding:8px 12px; margin-top:10px}
+[hidden]{display:none!important}
+</style>
+  <script type="module" crossorigin src="./assets/index-CV3yI_vx.js"></script>
+</head>
+<body>
+<main>
+  <h1>Dino Bricks 说英语测试</h1>
+  <p class="lead">请用孩子玩游戏的那台 iPad。点一张图，孩子对着 iPad 说出它的英文。第一次会问能不能用麦克风，请点「允许」。</p>
+  <p class="hint" id="device"></p>
+  <p class="note" id="problem" hidden></p>
+
+  <section class="card">
+    <div class="row seg" id="who"><b>谁在说</b>
+      <button type="button" data-v="child" aria-pressed="true">孩子</button>
+      <button type="button" data-v="adult" aria-pressed="false">大人</button>
+    </div>
+    <div class="row seg" id="mode"><b>怎么说</b>
+      <button type="button" data-v="repeat" aria-pressed="true">跟我说</button>
+      <button type="button" data-v="recall" aria-pressed="false">看图说</button>
+    </div>
+    <p class="hint" id="modeHint"></p>
+    <div class="words" id="words"></div>
+    <div class="row"><button type="button" class="pill" id="more">换一批词</button>
+      <span class="hint" id="pool"></span></div>
+  </section>
+
+  <section class="card">
+    <h2>每一次说的结果</h2>
+    <p class="hint">✅ 算对 · 🟡 只有更宽松的规则算对 · ❌ 不算对 · 🔇 没听到声音</p>
+    <ul id="log"></ul>
+  </section>
+
+  <section class="card">
+    <h2>结果</h2>
+    <dl id="sum"></dl>
+    <div class="row seg" id="volume"><b>声音</b><span>识别以后，iPad 说英语的声音有没有变小？</span>
+      <button type="button" data-v="same" aria-pressed="false">没有</button>
+      <button type="button" data-v="quieter" aria-pressed="false">变小了</button>
+    </div>
+    <p id="saved" class="hint"></p>
+    <p><b>测完请把这一屏截图发到微信。</b></p>
+  </section>
+</main>
+</body>
+</html>

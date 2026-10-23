@@ -13,8 +13,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="icon" href="./icon-192.png">
-  <script type="module" crossorigin src="./assets/index-CxIp3YQ8.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-DpzvUuyS.css">
+  <script type="module" crossorigin src="./assets/index-lAsBplBF.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DaHmw9u9.css">
 </head>
 <body>
 <div id="app">
@@ -92,28 +92,35 @@
             <span class="pic emoji">🙈</span>
             <span class="txt"><span class="h">What's Missing?</span><span class="zh" id="missingZh">少了哪一个</span><em class="badge" id="missingBadge"></em></span>
           </button>
-          <button class="game wide logic-entry" type="button" data-game="logic" style="--c:#BFD7F2;--fg:var(--ink)">
+          <button class="game logic-entry" type="button" data-game="logic" style="--c:#BFD7F2;--fg:var(--ink)">
             <span class="studs"><i></i><i></i><i></i></span>
             <span class="pic emoji">🧩</span>
             <span class="txt"><span class="h">恐龙动脑站</span><span class="zh" id="logicZh">每天四题，慢慢想</span><em class="badge" id="logicBadge"></em></span>
           </button>
+          <button class="game battle-entry" type="button" data-game="battle" style="--c:#F3D88C;--fg:var(--ink)">
+            <span class="studs"><i></i><i></i><i></i></span>
+            <span class="pic emoji">🦖</span>
+            <span class="txt"><span class="h">恐龙试炼场</span><span class="zh" id="battleZh">学好啦，再出发</span><em class="badge" id="battleBadge"></em></span>
+          </button>
           <button class="game" type="button" data-game="dino" style="--c:var(--orange)">
             <span class="studs"><i></i><i></i><i></i></span>
             <span class="pic me-art" id="shopPreview"></span>
-            <span class="txt"><span class="h">My Dino</span><span class="zh">装扮和商店</span></span>
+            <span class="txt"><span class="h">My Dino</span><span class="zh" id="dinoZh">装扮、贴纸和宝物</span></span>
           </button>
-          <button class="game" type="button" data-game="album" style="--c:var(--purple)">
+          <button class="game" type="button" data-game="words" style="--c:var(--purple)">
             <span class="studs"><i></i><i></i><i></i></span>
-            <span class="pic emoji" id="albumPreview">🏆</span>
-            <span class="txt"><span class="h">My Stickers</span><span class="zh" id="albumZh">我的贴纸</span></span>
+            <span class="pic emoji">📖</span>
+            <span class="txt"><span class="h">My Words</span><span class="zh" id="wordsZh">单词本和小知识</span></span>
           </button>
         </div>
       </div>
     </section>
 
     <section id="scr-play" class="screen" hidden></section>
+    <section id="scr-battle" class="screen" hidden></section>
 
     <section id="scr-dino" class="screen" hidden>
+      <div class="modes" role="tablist" aria-label="装扮和贴纸"><button class="mode" type="button" role="tab" data-mode="dino" aria-selected="true"><span class="emoji">👕</span>装扮</button><button class="mode" type="button" role="tab" data-mode="album" aria-selected="false"><span class="emoji">🏆</span>贴纸和宝物</button></div>
       <div class="room">
         <div class="room-stage">
           <div class="room-pet"><div class="room-dino me-art" id="roomAvatar"></div><p class="pet-name" id="roomName"></p></div>
@@ -139,8 +146,13 @@
     </section>
 
     <section id="scr-album" class="screen" hidden>
+      <div class="modes" role="tablist" aria-label="装扮和贴纸"><button class="mode" type="button" role="tab" data-mode="dino" aria-selected="false"><span class="emoji">👕</span>装扮</button><button class="mode" type="button" role="tab" data-mode="album" aria-selected="true"><span class="emoji">🏆</span>贴纸和宝物</button></div>
       <div class="album-head"><h2 class="title small">My Stickers</h2><p class="sub" id="albumCount"></p><span class="total" aria-label="钻石"><span class="emoji">💎</span><b id="albumGems">0</b></span></div>
       <div id="album"></div>
+    </section>
+
+    <section id="scr-words" class="screen" hidden>
+      <div id="wordsBook"></div>
     </section>
 
     <section id="scr-done" class="screen center" hidden>

@@ -13,8 +13,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="icon" href="./icon-192.png">
-  <script type="module" crossorigin src="./assets/index-Q9OdxrU9.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-C9ZzJexl.css">
+  <script type="module" crossorigin src="./assets/index-bhj8a24V.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BaQ-mxhq.css">
 </head>
 <body>
 <div id="app">
@@ -23,6 +23,7 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9.5h13V10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M10 19.5v-5h4v5z" fill="currentColor"/></svg>
     </button>
     <div class="logo" id="logo"><span class="mark" aria-hidden="true"></span><span>Dino <b>Bricks</b></span></div>
+    <time class="home-time" id="homeTime" lang="en" aria-label="当前日期和时间" hidden></time>
     <div class="dots" id="dots" hidden></div>
     <div class="bar-right">
       <button class="icon-btn" id="pauseBtn" type="button" aria-label="暂停，休息一会" hidden>
@@ -63,7 +64,7 @@
     <section id="scr-home" class="screen" hidden>
       <div class="home">
         <aside class="tower-card" aria-label="我的恐龙和宝贝">
-          <button class="me" type="button" data-game="dino" aria-label="我的恐龙"><span class="me-art" id="homeAvatar"></span></button>
+          <div class="home-pet"><button class="me" type="button" data-game="dino" aria-label="我的恐龙"><span class="me-art" id="homeAvatar"></span></button><p class="pet-name" id="homeName"></p></div>
           <div class="lvlrow" aria-label="等级"><span class="lvl" id="homeLevel">Lv 1</span><span class="lvlbar"><em id="homeLevelBar"></em></span></div>
           <div class="purse"><span class="total" aria-label="星星"><span class="emoji">⭐</span><b id="walletStars">0</b></span><span class="total" aria-label="钻石"><span class="emoji">💎</span><b id="walletGems">0</b></span></div>
           <button class="goal" type="button" id="homeGoal" data-game="dino" hidden></button>
@@ -115,12 +116,23 @@
     <section id="scr-dino" class="screen" hidden>
       <div class="room">
         <div class="room-stage">
-          <div class="room-dino me-art" id="roomAvatar"></div>
+          <div class="room-pet"><div class="room-dino me-art" id="roomAvatar"></div><p class="pet-name" id="roomName"></p></div>
           <div class="room-info"><span class="total"><span class="emoji">⭐</span><b id="roomWallet">0</b></span><span class="lvl" id="roomLevel">Lv 1</span></div>
           <div class="room-act" id="roomAct"></div>
         </div>
         <div class="room-shop">
           <div class="tabs" id="roomTabs" role="tablist" aria-label="部位"></div>
+          <section class="pet-naming" id="roomNaming" aria-label="给小恐龙起名字" hidden>
+            <h2>给小恐龙起个名字</h2>
+            <div class="name-presets" id="namePresets" role="group" aria-label="选一个名字"></div>
+            <form id="petNameForm">
+              <label for="petNameInput">也可以自己起名字</label>
+              <div class="name-input-row"><input id="petNameInput" name="petName" type="text" maxlength="60" autocomplete="off" spellcheck="false" aria-describedby="petNameHint petNameMessage"><button class="btn go" type="submit">用这个名字</button></div>
+              <p id="petNameHint">英文最多 15 个字符，中文最多 6 个字；混合输入按长度折算。</p>
+              <p class="name-message" id="petNameMessage" role="status"></p>
+            </form>
+            <h3>名字颜色</h3><p class="name-color-note">深色免费；彩色用星星买一次，以后随时换。</p>
+          </section>
           <div class="items" id="roomItems"></div>
         </div>
       </div>

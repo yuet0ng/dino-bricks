@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Dino Bricks English</title>
+<title>Dino Quest 恐龙大冒险</title>
 <meta name="description" content="7岁零基础孩子的英语听力小游戏">
 <meta name="theme-color" content="#BCE2CC">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Dino Bricks">
+<meta name="apple-mobile-web-app-title" content="Dino Quest">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="icon" href="./icon-192.png">
-  <script type="module" crossorigin src="./assets/index-lAsBplBF.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-DaHmw9u9.css">
+  <script type="module" crossorigin src="./assets/index-DiIBAUjr.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-FfeErXno.css">
 </head>
 <body>
 <div id="app">
@@ -22,7 +22,7 @@
     <button class="icon-btn" id="homeBtn" type="button" aria-label="回到首页" hidden>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9.5h13V10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M10 19.5v-5h4v5z" fill="currentColor"/></svg>
     </button>
-    <div class="logo" id="logo"><span class="mark" aria-hidden="true"></span><span>Dino <b>Bricks</b></span></div>
+    <div class="logo" id="logo"><svg class="mark" viewBox="52 22 136 138" aria-hidden="true"><g data-dino-form="trex"><path d="M152 198 Q206 196 224 236 Q198 240 156 228 Z" fill="#6CC77A" stroke="#1F2A4D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="96" cy="240" rx="22" ry="12" fill="#6CC77A" stroke="#1F2A4D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="144" cy="240" rx="22" ry="12" fill="#6CC77A" stroke="#1F2A4D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="120" cy="190" rx="56" ry="50" fill="#6CC77A" stroke="#1F2A4D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="120" cy="200" rx="34" ry="34" fill="#D5F2DB"/><ellipse cx="68" cy="178" rx="10" ry="18" transform="rotate(-35 68 178)" fill="#6CC77A" stroke="#1F2A4D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="172" cy="178" rx="10" ry="18" transform="rotate(35 172 178)" fill="#6CC77A" stroke="#1F2A4D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M92 66 L100 36 L114 60 Z M108 60 L120 28 L132 60 Z M126 60 L140 36 L148 66 Z" fill="#FFC531" stroke="#1F2A4D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="120" cy="104" rx="62" ry="50" fill="#6CC77A" stroke="#1F2A4D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><g class="eyes-open"><ellipse cx="97" cy="98" rx="13" ry="14" fill="#fff" stroke="#1F2A4D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="143" cy="98" rx="13" ry="14" fill="#fff" stroke="#1F2A4D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><circle cx="99" cy="101" r="6.5" fill="#1F2A4D"/><circle cx="145" cy="101" r="6.5" fill="#1F2A4D"/><circle cx="101.5" cy="98" r="2.2" fill="#fff"/><circle cx="147.5" cy="98" r="2.2" fill="#fff"/></g><ellipse cx="80" cy="122" rx="8" ry="5" fill="#FF8FA8" opacity=".55"/><ellipse cx="160" cy="122" rx="8" ry="5" fill="#FF8FA8" opacity=".55"/><path d="M106 126 Q120 138 134 126" fill="none" stroke="#1F2A4D" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></g></svg><span>Dino <b>Quest</b></span></div>
     <time class="home-time" id="homeTime" lang="en" aria-label="当前日期和时间" hidden></time>
     <div class="dots" id="dots" hidden></div>
     <div class="bar-right">
@@ -44,16 +44,13 @@
   <main id="stage">
     <section id="scr-start" class="screen center">
       <div class="hero">
-        <div class="hero-pic">
+        <div class="hero-pic start-pic">
           <div class="dino me-art" id="startAvatar"></div>
-          <div class="hero-bricks" aria-hidden="true">
-            <i style="--c:var(--yellow);--w:96px"></i>
-            <i style="--c:var(--blue);--w:132px"></i>
-            <i style="--c:var(--red);--w:168px"></i>
-          </div>
+          <svg class="hero-sky" viewBox="0 0 360 200" aria-hidden="true"><g stroke="#1F2A4D" stroke-linejoin="round"><polygon points="44.0,88.0 49.8,102.0 64.9,103.2 53.4,113.1 56.9,127.8 44.0,119.9 31.1,127.8 34.6,113.1 23.1,103.2 38.2,102.0" fill="#FFC531" stroke-width="4"/><polygon points="318.0,49.0 322.5,59.8 334.2,60.7 325.3,68.4 328.0,79.8 318.0,73.7 308.0,79.8 310.7,68.4 301.8,60.7 313.5,59.8" fill="#FFC531" stroke-width="4"/><polygon points="292.0,124.0 294.1,129.1 299.6,129.5 295.4,133.1 296.7,138.5 292.0,135.6 287.3,138.5 288.6,133.1 284.4,129.5 289.9,129.1" fill="#FFF3B8" stroke-width="3"/><polygon points="76.0,38.0 78.1,43.1 83.6,43.5 79.4,47.1 80.7,52.5 76.0,49.6 71.3,52.5 72.6,47.1 68.4,43.5 73.9,43.1" fill="#FFF3B8" stroke-width="3"/></g></svg>
+          <svg class="hero-ground" viewBox="0 0 360 104" aria-hidden="true"><g stroke="#1F2A4D" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M6 100C18 40 108 22 180 22S342 40 354 100Z" fill="#6CC77A"/><path d="M58 58C96 40 140 34 176 34" fill="none" stroke="#A7E3AF" stroke-width="8"/><path d="M64 84l4-10 4 8 4-9 4 11M226 80l4-9 4 7 4-8 4 10" fill="none" stroke-width="3.5"/><g transform="translate(262 26)"><rect x="0" y="22" width="64" height="40" rx="7" fill="#C8823A"/><path d="M0 28Q0 0 32 0Q64 0 64 28Z" fill="#E7A453"/><path d="M0 30H64" fill="none"/><rect x="25" y="20" width="14" height="18" rx="4" fill="#FFC531"/></g></g></svg>
         </div>
-        <h1 class="title">Dino <b>Bricks</b></h1>
-        <p class="sub">听英语 · 动脑筋 · 开宝箱</p>
+        <h1 class="title">Dino <b>Quest</b></h1>
+        <p class="sub">恐龙大冒险 · 听英语 · 动脑筋 · 开宝箱</p>
         <button class="playbtn" id="startBtn" type="button" aria-label="开始">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.8v14.4L19 12z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
         </button>

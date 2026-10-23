@@ -1,6 +1,6 @@
 {
-  "name": "Dino Bricks English",
-  "short_name": "Dino Bricks",
+  "name": "Dino Quest 恐龙大冒险",
+  "short_name": "Dino Quest",
   "lang": "zh-CN",
   "start_url": "./",
   "scope": "./",
@@ -18,12 +18,6 @@
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ]
 }

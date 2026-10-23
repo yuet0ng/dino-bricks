@@ -13,8 +13,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="icon" href="./icon-192.png">
-  <script type="module" crossorigin src="./assets/index-bhj8a24V.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BaQ-mxhq.css">
+  <script type="module" crossorigin src="./assets/index-DM-xxrfg.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BsbQ9b8c.css">
 </head>
 <body>
 <div id="app">
@@ -213,6 +213,19 @@
 </div>
 
 <div class="sheet-wrap" id="parentPanel" hidden></div>
+
+<div class="overlay help-overlay" id="helpOverlay" hidden>
+  <div class="dialog help-dialog" role="alertdialog" aria-modal="true" aria-labelledby="helpTitle" aria-describedby="helpReason">
+    <div class="help-art"><span class="me-art" id="helpAvatar"></span><span class="emoji help-sign" aria-hidden="true">🙋</span></div>
+    <h2 id="helpTitle">请联系家长</h2>
+    <p class="help-kid">需要大人来帮忙看看</p>
+    <p class="help-reason" id="helpReason"></p>
+    <div class="btnrow">
+      <button class="btn" type="button" id="helpReload"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>重新打开</span></button>
+      <button class="btn go" type="button" id="helpHome"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10v9.5h13V10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></svg><span>回首页</span></button>
+    </div>
+  </div>
+</div>
 <canvas id="confetti" aria-hidden="true"></canvas>
 </body>
 </html>

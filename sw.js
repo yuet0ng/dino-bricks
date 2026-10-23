@@ -1,8 +1,8 @@
 // Cache-first: the game opens instantly and keeps working when the network is flaky.
 // A new build changes VERSION, so the browser installs this worker again and re-caches.
-const VERSION = '50b99ad13d77';
+const VERSION = '01dd1a8428c3';
 const CACHE = 'dino-bricks-' + VERSION;
-const SHELL = ["./","assets/Baloo2-983902d8-8NeBJN4T.woff2","assets/LilitaOne-2d81a505-CiZ7RRtu.woff2","assets/index-BBrifnIW.js","assets/index-DGMI70gr.css","index.html","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png"];
+const SHELL = ["./","assets/Baloo2-983902d8-8NeBJN4T.woff2","assets/LilitaOne-2d81a505-CiZ7RRtu.woff2","assets/index-C9ZzJexl.css","assets/index-Q9OdxrU9.js","index.html","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png"];
 
 // 'reload' skips the browser's HTTP cache, so a page fetched just before an update can't end up in the new set.
 self.addEventListener('install', e => {

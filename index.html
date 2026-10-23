@@ -13,8 +13,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="icon" href="./icon-192.png">
-  <script type="module" crossorigin src="./assets/index-BBrifnIW.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-DGMI70gr.css">
+  <script type="module" crossorigin src="./assets/index-Q9OdxrU9.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-C9ZzJexl.css">
 </head>
 <body>
 <div id="app">
@@ -28,7 +28,7 @@
       <button class="icon-btn" id="pauseBtn" type="button" aria-label="暂停，休息一会" hidden>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/></svg>
       </button>
-      <div class="mini-tower" id="miniTower" aria-label="积木进度" hidden></div>
+      <div class="pill bar-stars" id="barStars" aria-label="星星" hidden><span class="emoji">⭐</span><b id="barStarCount">0</b></div>
       <div class="pill timer" id="timer" aria-label="今天剩余时间">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 9v4l3 2M9 3h6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
         <span id="timerText">10</span><small>分钟</small>
@@ -52,7 +52,7 @@
           </div>
         </div>
         <h1 class="title">Dino <b>Bricks</b></h1>
-        <p class="sub">听英语 · 玩游戏 · 搭积木</p>
+        <p class="sub">听英语 · 动脑筋 · 开宝箱</p>
         <button class="playbtn" id="startBtn" type="button" aria-label="开始">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.8v14.4L19 12z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
         </button>
@@ -62,20 +62,19 @@
 
     <section id="scr-home" class="screen" hidden>
       <div class="home">
-        <aside class="tower-card" aria-label="我的恐龙和积木塔">
+        <aside class="tower-card" aria-label="我的恐龙和宝贝">
           <button class="me" type="button" data-game="dino" aria-label="我的恐龙"><span class="me-art" id="homeAvatar"></span></button>
           <div class="lvlrow" aria-label="等级"><span class="lvl" id="homeLevel">Lv 1</span><span class="lvlbar"><em id="homeLevelBar"></em></span></div>
-          <div class="total"><span class="emoji">⭐</span><b id="walletStars">0</b></div>
+          <div class="purse"><span class="total" aria-label="星星"><span class="emoji">⭐</span><b id="walletStars">0</b></span><span class="total" aria-label="钻石"><span class="emoji">💎</span><b id="walletGems">0</b></span></div>
           <button class="goal" type="button" id="homeGoal" data-game="dino" hidden></button>
-          <div class="tower-label"><b id="brickCount">0</b><span>/10</span></div>
-          <div class="tower" id="tower"></div>
-          <p class="tower-note">一颗星星加一块积木<br>搭满 10 块送新贴纸<br>贴纸集齐了送星星</p>
+          <div class="showcase" id="showcase" aria-label="我的宝贝"></div>
+          <p class="tower-note">点格子，摆上贴纸和宝贝<br>终极挑战、动脑站能开宝箱</p>
         </aside>
         <div class="games">
           <button class="game" type="button" data-game="learn" style="--c:var(--yellow);--fg:var(--ink)">
             <span class="studs"><i></i><i></i><i></i></span>
             <span class="pic emoji">🐣</span>
-            <span class="txt"><span class="h">New Words</span><span class="zh">学新词，再听音找图</span><em class="badge" id="learnBadge"></em></span>
+            <span class="txt"><span class="h">New Words</span><span class="zh" id="learnZh">学新词，再听音找图</span><em class="badge" id="learnBadge"></em></span>
           </button>
           <button class="game" type="button" data-game="say" style="--c:var(--blue)">
             <span class="studs"><i></i><i></i><i></i></span>
@@ -92,6 +91,11 @@
             <span class="pic emoji">🙈</span>
             <span class="txt"><span class="h">What's Missing?</span><span class="zh" id="missingZh">少了哪一个</span><em class="badge" id="missingBadge"></em></span>
           </button>
+          <button class="game wide logic-entry" type="button" data-game="logic" style="--c:#BFD7F2;--fg:var(--ink)">
+            <span class="studs"><i></i><i></i><i></i></span>
+            <span class="pic emoji">🧩</span>
+            <span class="txt"><span class="h">恐龙动脑站</span><span class="zh" id="logicZh">每天四题，慢慢想</span><em class="badge" id="logicBadge"></em></span>
+          </button>
           <button class="game" type="button" data-game="dino" style="--c:var(--orange)">
             <span class="studs"><i></i><i></i><i></i></span>
             <span class="pic me-art" id="shopPreview"></span>
@@ -101,11 +105,6 @@
             <span class="studs"><i></i><i></i><i></i></span>
             <span class="pic emoji" id="albumPreview">🏆</span>
             <span class="txt"><span class="h">My Stickers</span><span class="zh" id="albumZh">我的贴纸</span></span>
-          </button>
-          <button class="game wide logic-entry" type="button" data-game="logic" style="--c:#BFD7F2;--fg:var(--ink)">
-            <span class="studs"><i></i><i></i><i></i></span>
-            <span class="pic emoji">🧩</span>
-            <span class="txt"><span class="h">恐龙动脑站</span><span class="zh" id="logicZh">每天四题，慢慢想</span><em class="badge" id="logicBadge"></em></span>
           </button>
         </div>
       </div>
@@ -128,7 +127,7 @@
     </section>
 
     <section id="scr-album" class="screen" hidden>
-      <div class="album-head"><h2 class="title small">My Stickers</h2><p class="sub" id="albumCount"></p></div>
+      <div class="album-head"><h2 class="title small">My Stickers</h2><p class="sub" id="albumCount"></p><span class="total" aria-label="钻石"><span class="emoji">💎</span><b id="albumGems">0</b></span></div>
       <div id="album"></div>
     </section>
 
@@ -169,14 +168,23 @@
   </div>
 </div>
 
-<div class="overlay" id="stickerOverlay" hidden>
-  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="stickerTitle">
-    <h2 id="stickerTitle">New sticker!</h2>
-    <div class="sticker-stage"><div class="sun"></div><span class="emoji sticker-big" id="stickerBig">🦖</span></div>
-    <p id="stickerNote">积木塔搭好啦，得到一张新贴纸！</p>
-    <button class="btn go" id="stickerOk" type="button">
+<div class="overlay" id="chestOverlay" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="chestTitle">
+    <h2 id="chestTitle">A treasure chest!</h2>
+    <button class="chest-art" id="chestArt" type="button" aria-label="打开宝箱"></button>
+    <div class="loot" id="chestLoot" hidden></div>
+    <p id="chestNote"></p>
+    <button class="btn go" id="chestOk" type="button" hidden>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>收下</span>
     </button>
+  </div>
+</div>
+
+<div class="overlay" id="pickOverlay" hidden>
+  <div class="dialog pick-dialog" role="dialog" aria-modal="true" aria-labelledby="pickTitle">
+    <h2 id="pickTitle" class="pick-title">摆什么上去？</h2>
+    <div class="pick" id="pickItems"></div>
+    <div class="btnrow"><button class="btn" type="button" id="pickClear"><span>拿下来</span></button><button class="btn go" type="button" id="pickClose"><span>好了</span></button></div>
   </div>
 </div>
 

@@ -13,8 +13,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="icon" href="./icon-192.png">
-  <script type="module" crossorigin src="./assets/index-DM-xxrfg.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BsbQ9b8c.css">
+  <script type="module" crossorigin src="./assets/index-Cwu6vP2o.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DpzvUuyS.css">
 </head>
 <body>
 <div id="app">
@@ -213,6 +213,20 @@
 </div>
 
 <div class="sheet-wrap" id="parentPanel" hidden></div>
+
+<div class="overlay code-overlay" id="codeOverlay" hidden>
+  <div class="dialog code-dialog" role="dialog" aria-modal="true" aria-labelledby="codeTitle">
+    <h2 id="codeTitle">请家长输入邀请码</h2>
+    <p class="code-lead">第一次在这台设备上玩，请输入<b>邀请码</b>或<b>家庭码</b>（8 位字母和数字，不分大小写）。</p>
+    <form id="codeForm" class="code-form">
+      <input id="codeInput" type="text" size="10" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="12" placeholder="例如 ABCD-2345" aria-label="邀请码或家庭码">
+      <button class="btn go" type="submit" id="codeOk"><span>确定</span></button>
+    </form>
+    <p class="code-msg" id="codeMsg" role="status"></p>
+    <p class="code-help" id="codeHelp">邀请码：维护者发给你的，只能用一次，用来新建家庭。家庭码：家庭建好以后，所有设备都用它登录；在已经登录的设备上，长按「家长」，在「存档」里能看到。</p>
+    <button class="btn go" type="button" id="codeGo" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg><span>开始玩</span></button>
+  </div>
+</div>
 
 <div class="overlay help-overlay" id="helpOverlay" hidden>
   <div class="dialog help-dialog" role="alertdialog" aria-modal="true" aria-labelledby="helpTitle" aria-describedby="helpReason">

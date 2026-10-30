@@ -1,12 +1,12 @@
 // Cache-first: the game opens instantly and keeps working when the network is flaky.
 // A new build changes VERSION, so the browser installs this worker again and re-caches.
-const VERSION = '8af00312e414';
+const VERSION = 'fd2b34fb0d28';
 const CACHE = 'dino-bricks-' + VERSION;
-const SHELL = ["./","assets/Baloo2-983902d8-8NeBJN4T.woff2","assets/LilitaOne-2d81a505-CiZ7RRtu.woff2","assets/index-DNwrRuLa.css","assets/index-DchQRHj9.js","index.html","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png"];
+const SHELL = ["./","assets/Baloo2-983902d8-8NeBJN4T.woff2","assets/LilitaOne-2d81a505-CiZ7RRtu.woff2","assets/index-DszVg570.js","assets/index-ZwJxOdPC.css","index.html","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png"];
 
 self.addEventListener('message', e => {
   if (e.data && e.data.type === 'DINO_VERSION' && e.ports && e.ports[0]) {
-    e.ports[0].postMessage({type:'DINO_VERSION', build:VERSION, version:'0.8.7'});
+    e.ports[0].postMessage({type:'DINO_VERSION', build:VERSION, version:'0.8.8'});
   }
 });
 

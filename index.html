@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta name="dino-build" content="38eb423b13fb">
+<meta name="dino-build" content="5f5605d61188">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Dino Quest 恐龙大冒险</title>
@@ -14,8 +14,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="icon" href="./icon-192.png">
-  <script type="module" crossorigin src="./assets/index-CiRJLSao.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-B39XPYmN.css">
+  <script type="module" crossorigin src="./assets/index-8wfDhklY.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CyyNespn.css">
 </head>
 <body>
 <div id="app">
@@ -69,8 +69,9 @@
           <div class="lvlrow" aria-label="等级"><span class="lvl" id="homeLevel">Lv 1</span><span class="lvlbar"><em id="homeLevelBar"></em></span></div>
           <div class="purse"><span class="total" aria-label="星星"><span class="emoji">⭐</span><b id="walletStars">0</b></span><span class="total" aria-label="钻石"><span class="emoji">💎</span><b id="walletGems">0</b></span></div>
           <button class="goal" type="button" id="homeGoal" data-game="dino" hidden></button>
+          <div class="home-medals" id="homeMedals" aria-label="我的勋章，点一下换一换" hidden></div>
           <div class="showcase" id="showcase" aria-label="我的宝贝"></div>
-          <p class="tower-note">点格子，摆上贴纸和宝贝<br>终极挑战、动脑站、试炼场能开宝箱</p>
+          <p class="tower-note">点格子，摆上你的宝贝</p>
         </aside>
         <div class="games">
           <button class="game" type="button" data-game="learn" style="--c:var(--yellow);--fg:var(--ink)">
@@ -122,7 +123,7 @@
     <section id="scr-riddle" class="screen" hidden aria-label="恐龙每日趣问"></section>
 
     <section id="scr-dino" class="screen" hidden>
-      <div class="modes" role="tablist" aria-label="装扮和贴纸"><button class="mode" type="button" role="tab" data-mode="dino" aria-selected="true"><span class="emoji">👕</span>装扮</button><button class="mode" type="button" role="tab" data-mode="album" aria-selected="false"><span class="emoji">🏆</span>贴纸和宝物</button></div>
+      <div class="modes" role="tablist" aria-label="装扮和收藏"><button class="mode" type="button" role="tab" data-mode="dino" aria-selected="true"><span class="emoji">👕</span>装扮</button><button class="mode" type="button" role="tab" data-mode="album" aria-selected="false"><span class="emoji">💎</span>宝物</button><button class="mode" type="button" role="tab" data-mode="medals" aria-selected="false"><span class="emoji">🎖️</span>勋章</button></div>
       <div class="room">
         <div class="room-stage">
           <div class="room-pet"><div class="room-dino me-art" id="roomAvatar"></div><p class="pet-name" id="roomName"></p></div>
@@ -148,9 +149,15 @@
     </section>
 
     <section id="scr-album" class="screen" hidden>
-      <div class="modes" role="tablist" aria-label="装扮和贴纸"><button class="mode" type="button" role="tab" data-mode="dino" aria-selected="false"><span class="emoji">👕</span>装扮</button><button class="mode" type="button" role="tab" data-mode="album" aria-selected="true"><span class="emoji">🏆</span>贴纸和宝物</button></div>
+      <div class="modes" role="tablist" aria-label="装扮和收藏"><button class="mode" type="button" role="tab" data-mode="dino" aria-selected="false"><span class="emoji">👕</span>装扮</button><button class="mode" type="button" role="tab" data-mode="album" aria-selected="true"><span class="emoji">💎</span>宝物</button><button class="mode" type="button" role="tab" data-mode="medals" aria-selected="false"><span class="emoji">🎖️</span>勋章</button></div>
       <div class="album-head"><h2 class="title small">My Stickers</h2><p class="sub" id="albumCount"></p><span class="total" aria-label="钻石"><span class="emoji">💎</span><b id="albumGems">0</b></span></div>
       <div id="album"></div>
+    </section>
+
+    <section id="scr-medals" class="screen" hidden>
+      <div class="modes" role="tablist" aria-label="装扮和收藏"><button class="mode" type="button" role="tab" data-mode="dino" aria-selected="false"><span class="emoji">👕</span>装扮</button><button class="mode" type="button" role="tab" data-mode="album" aria-selected="false"><span class="emoji">💎</span>宝物</button><button class="mode" type="button" role="tab" data-mode="medals" aria-selected="true"><span class="emoji">🎖️</span>勋章</button></div>
+      <div class="medal-heading"><h1>我的勋章</h1><span id="medalCount" aria-label="已兑换勋章数"></span></div>
+      <div id="medalCollection"></div>
     </section>
 
     <section id="scr-words" class="screen" hidden>
@@ -203,6 +210,13 @@
     <button class="btn go" id="chestOk" type="button" hidden>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>收下</span>
     </button>
+  </div>
+</div>
+
+<div class="overlay medal-overlay" id="medalOverlay" hidden>
+  <div class="dialog medal-dialog" role="dialog" aria-modal="true" aria-labelledby="medalTitle">
+    <h2 id="medalTitle"></h2><button class="medal-close" id="medalClose" type="button" aria-label="关闭">×</button>
+    <div class="medal-body" id="medalBody"></div>
   </div>
 </div>
 

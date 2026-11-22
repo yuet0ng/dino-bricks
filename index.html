@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta name="dino-build" content="c528fc6d2d12">
+<meta name="dino-build" content="d0f4ce9280e3">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Dino Quest 恐龙大冒险</title>
@@ -14,8 +14,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="icon" href="./icon-192.png">
-  <script type="module" crossorigin src="./assets/index-DmebHt35.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-CIPnWyHW.css">
+  <script type="module" crossorigin src="./assets/index-CtxaKs2C.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-Zgdp6qDc.css">
 </head>
 <body>
 <div class="theme-scenery" id="themeScenery" aria-hidden="true"></div>
@@ -68,7 +68,8 @@
 
     <section id="scr-home" class="screen" hidden>
       <aside class="update-notice" data-update-notice hidden aria-label="游戏更新">
-        <p data-update-text role="status"></p><button class="sbtn" type="button" data-update-game>↻ 更新游戏</button>
+        <p data-update-text role="status"></p>
+        <span class="update-go"><button class="sbtn" type="button" data-update-game>↻ 更新游戏</button><span class="update-point emoji" aria-hidden="true">👉</span></span>
       </aside>
       <div class="home">
         <aside class="tower-card" aria-label="我的恐龙和宝贝">
@@ -249,6 +250,26 @@
     <button class="btn go" id="levelOk" type="button">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>好的</span>
     </button>
+  </div>
+</div>
+
+<div class="overlay update-overlay" id="updateOverlay" hidden>
+  <div class="dialog update-dialog" role="dialog" aria-modal="true" aria-labelledby="updateTitle">
+    <button class="update-close" type="button" id="updateLater" aria-label="暂时不更新">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/></svg>
+    </button>
+    <div class="update-stage" aria-hidden="true">
+      <div class="sun"></div>
+      <div class="update-dino me-art" id="updateAvatar"></div>
+      <svg class="update-badge" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#5B9BEA" stroke="#1F2A4D" stroke-width="3.5"/><g fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 30A12 12 0 0 1 41 23M43 15V24H34"/><path d="M44 34A12 12 0 0 1 23 41M21 49V40H30"/></g></svg>
+      <svg class="update-spark s1" viewBox="0 0 40 40"><path d="M20 3 24 16 37 20 24 24 20 37 16 24 3 20 16 16Z" fill="#FFF3A6" stroke="#1F2A4D" stroke-width="2.5" stroke-linejoin="round"/></svg>
+      <svg class="update-spark s2" viewBox="0 0 40 40"><path d="M20 3 24 16 37 20 24 24 20 37 16 24 3 20 16 16Z" fill="#FFF3A6" stroke="#1F2A4D" stroke-width="2.5" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="update-copy">
+      <h2 id="updateTitle">有新版本啦！</h2>
+      <p id="updateNote" role="status" hidden></p>
+      <span class="update-go"><span class="update-point emoji" aria-hidden="true">👉</span><button class="btn update-btn" type="button" data-update-game>↻ 更新游戏</button></span>
+    </div>
   </div>
 </div>
 
